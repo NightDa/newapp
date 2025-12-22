@@ -1,7 +1,7 @@
 {
   "name": "BenGo Delivery",
   "short_name": "TastyHub",
-  "start_url": "./index.html",
+  "start_url": "/newapp/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#8B0000",
