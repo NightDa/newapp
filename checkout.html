@@ -233,6 +233,37 @@
       gap: 3px;
     }
     
+    /* Customization Badges */
+    .customization-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
+    
+    .customization-badge {
+      background: rgba(139, 0, 0, 0.1);
+      color: var(--primary-red);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    
+    /* Special Instructions */
+    .special-instructions {
+      color: var(--text-light);
+      font-size: 0.75rem;
+      font-style: italic;
+      margin-top: 4px;
+      padding: 3px 8px;
+      background: rgba(139, 0, 0, 0.05);
+      border-radius: 6px;
+      border-left: 2px solid var(--primary-red);
+    }
+    
     /* Cart Summary */
     .summary-title {
       font-size: 1.3rem;
@@ -395,6 +426,96 @@
       margin-right: 4px;
     }
     
+    /* Customer Information Form */
+    .customer-info {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    
+    .customer-info h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--primary-red);
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-dark);
+    }
+    
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      background-color: #F9F9F9;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-red);
+      background-color: white;
+      box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    /* Delivery Time Selection */
+    .delivery-time {
+      margin-bottom: 15px;
+    }
+    
+    .time-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .time-option {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+    }
+    
+    .time-option.selected {
+      border-color: var(--primary-red);
+      background: rgba(139, 0, 0, 0.05);
+      font-weight: 500;
+    }
+    
+    .time-option i {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--primary-red);
+    }
+    
     /* Responsive Design */
     @media (max-width: 1024px) {
       .cart-container {
@@ -445,12 +566,20 @@
       .payment-option {
         padding: 10px;
       }
+      
+      .time-options {
+        flex-direction: column;
+      }
+      
+      .time-option {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Fixed Back Button - تم التعديل هنا -->
+    <!-- Fixed Back Button -->
     <div class="back-btn" id="back-button">
       <i class="fas fa-arrow-left"></i>
     </div>
@@ -459,6 +588,36 @@
     <div class="header">
       <h1>Checkout</h1>
       <p>Review your order and complete your purchase</p>
+    </div>
+    
+    <!-- Customer Information -->
+    <div class="customer-info">
+      <h3>Customer Information</h3>
+      <div class="form-group">
+        <label for="customerName">Full Name *</label>
+        <input type="text" id="customerName" placeholder="Enter your full name" required>
+      </div>
+      <div class="form-group">
+        <label for="customerPhone">Phone Number *</label>
+        <input type="tel" id="customerPhone" placeholder="Enter your phone number" required>
+      </div>
+      <div class="form-group">
+        <label for="customerAddress">Delivery Address *</label>
+        <textarea id="customerAddress" placeholder="Enter your full address for delivery" required></textarea>
+      </div>
+      <div class="delivery-time">
+        <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 10px; color: var(--text-dark);">Delivery Time</label>
+        <div class="time-options">
+          <div class="time-option selected" data-time="asap">
+            <i class="fas fa-bolt"></i>
+            <span>ASAP (25-35 min)</span>
+          </div>
+          <div class="time-option" data-time="later">
+            <i class="far fa-clock"></i>
+            <span>Schedule Later</span>
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- Cart Layout -->
@@ -512,6 +671,14 @@
               <i class="fas fa-money-bill-wave"></i>
             </div>
           </div>
+          
+          <div class="payment-option">
+            <input type="radio" id="card" name="payment">
+            <label for="card">Credit/Debit Card</label>
+            <div class="payment-icon">
+              <i class="fas fa-credit-card"></i>
+            </div>
+          </div>
         </div>
         
         <button class="checkout-btn" id="checkout-btn">
@@ -532,6 +699,15 @@
     // Constants
     const DELIVERY_FEE = 20.00;
     const TAX_RATE = 0.10; // 10%
+    const WHATSAPP_NUMBER = "212642620325";
+
+    // Customer Information
+    let customerInfo = {
+      name: "",
+      phone: "",
+      address: "",
+      deliveryTime: "asap"
+    };
 
     // DOM elements
     const cartItemsContainer = document.getElementById('cart-items-container');
@@ -544,10 +720,21 @@
     const checkoutBtn = document.getElementById('checkout-btn');
     const backButton = document.getElementById('back-button');
 
+    // Customer Information Elements
+    const customerNameInput = document.getElementById('customerName');
+    const customerPhoneInput = document.getElementById('customerPhone');
+    const customerAddressInput = document.getElementById('customerAddress');
+    const timeOptions = document.querySelectorAll('.time-option');
+
     // دالة للحصول على محتويات السلة من localStorage
     function getCart() {
-      const cartData = localStorage.getItem('mcdonaldsCart');
-      return cartData ? JSON.parse(cartData) : [];
+      try {
+        const cartData = localStorage.getItem('mcdonaldsCart');
+        return cartData ? JSON.parse(cartData) : [];
+      } catch (error) {
+        console.error("Error loading cart from localStorage:", error);
+        return [];
+      }
     }
     
     // دالة لحفظ السلة في localStorage
@@ -555,12 +742,124 @@
       localStorage.setItem('mcdonaldsCart', JSON.stringify(cart));
     }
     
+    // دالة لتحويل الخيارات المخصصة إلى نص قابل للعرض
+    function formatCustomizationsForDisplay(item) {
+      let customizations = [];
+      
+      // معالجة جميع أنواع التخصيصات
+      if (item.customizations) {
+        Object.keys(item.customizations).forEach(key => {
+          const value = item.customizations[key];
+          
+          // تخطي الحقول الفارغة
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            return;
+          }
+          
+          // تحويل المفتاح إلى نص مقروء
+          let displayKey = key;
+          switch(key) {
+            case 'drink': displayKey = 'Drink'; break;
+            case 'size': displayKey = 'Size'; break;
+            case 'remove': displayKey = 'Remove'; break;
+            case 'extras': displayKey = 'Extras'; break;
+            case 'sauces': displayKey = 'Sauces'; break;
+            case 'dressing': displayKey = 'Dressing'; break;
+            case 'salt': displayKey = 'Salt Level'; break;
+            default: displayKey = key.charAt(0).toUpperCase() + key.slice(1);
+          }
+          
+          // معالجة القيم المختلفة
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              // إذا كانت المصفوفة تحتوي على كائنات
+              if (typeof value[0] === 'object') {
+                const labels = value.map(v => v.label || v.value).filter(v => v);
+                if (labels.length > 0) {
+                  customizations.push(`${displayKey}: ${labels.join(', ')}`);
+                }
+              } else {
+                // إذا كانت المصفوفة تحتوي على قيم نصية مباشرة
+                customizations.push(`${displayKey}: ${value.join(', ')}`);
+              }
+            }
+          } else if (typeof value === 'object' && value !== null) {
+            // إذا كانت القيمة كائن
+            const label = value.label || value.value;
+            if (label) {
+              customizations.push(`${displayKey}: ${label}`);
+            }
+          } else if (value) {
+            // إذا كانت القيمة نصية مباشرة
+            customizations.push(`${displayKey}: ${value}`);
+          }
+        });
+      }
+      
+      return customizations;
+    }
+    
+    // دالة لتحويل الخيارات المخصصة إلى نص للرسالة
+    function formatCustomizationsForMessage(item) {
+      let customizationsText = "";
+      
+      if (item.customizations) {
+        Object.keys(item.customizations).forEach(key => {
+          const value = item.customizations[key];
+          
+          // تخطي الحقول الفارغة
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            return;
+          }
+          
+          // تحويل المفتاح إلى نص مقروء
+          let displayKey = key;
+          switch(key) {
+            case 'drink': displayKey = 'Drink'; break;
+            case 'size': displayKey = 'Size'; break;
+            case 'remove': displayKey = 'Remove'; break;
+            case 'extras': displayKey = 'Extras'; break;
+            case 'sauces': displayKey = 'Sauces'; break;
+            case 'dressing': displayKey = 'Dressing'; break;
+            case 'salt': displayKey = 'Salt Level'; break;
+            default: displayKey = key.charAt(0).toUpperCase() + key.slice(1);
+          }
+          
+          // معالجة القيم المختلفة
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              let itemsList = [];
+              value.forEach(v => {
+                if (typeof v === 'object') {
+                  itemsList.push(v.label || v.value);
+                } else {
+                  itemsList.push(v);
+                }
+              });
+              customizationsText += `   • ${displayKey}: ${itemsList.join(', ')}\n`;
+            }
+          } else if (typeof value === 'object' && value !== null) {
+            const label = value.label || value.value;
+            if (label) {
+              customizationsText += `   • ${displayKey}: ${label}\n`;
+            }
+          } else if (value) {
+            customizationsText += `   • ${displayKey}: ${value}\n`;
+          }
+        });
+      }
+      
+      return customizationsText;
+    }
+    
     // Initialize the cart
     function initCart() {
       cart = getCart();
+      console.log("Cart loaded from localStorage:", cart);
       renderCartItems();
       updateCartDisplay();
       attachEventListeners();
+      loadCustomerInfo();
     }
     
     // Render cart items in the UI
@@ -572,7 +871,7 @@
           <div class="empty-cart">
             <i class="fas fa-shopping-cart"></i>
             <p>Your cart is empty</p>
-            <a href="index.html" class="browse-btn">Browse Menu</a>
+            <a href="menukfc.html" class="browse-btn">Browse Menu</a>
           </div>
         `;
         return;
@@ -583,22 +882,11 @@
         itemElement.className = 'item-card';
         itemElement.setAttribute('data-id', index);
         
-        // إنشاء وصف للخيارات المخصصة
-        let customizations = '';
-        if (item.drink && item.drink !== "none") {
-          customizations += `Drink: ${item.drink}, `;
-        }
-        if (item.remove && item.remove.length > 0) {
-          customizations += `Removed: ${item.remove.join(', ')}, `;
-        }
-        if (item.extras && item.extras.length > 0) {
-          customizations += `Extras: ${item.extras.join(', ')}, `;
-        }
+        // الحصول على الخيارات المخصصة
+        const customizations = formatCustomizationsForDisplay(item);
         
-        // إزالة الفاصلة الأخيرة إذا كانت موجودة
-        if (customizations.endsWith(', ')) {
-          customizations = customizations.slice(0, -2);
-        }
+        // حساب السعر لكل عنصر
+        const pricePerUnit = item.totalPrice / item.quantity;
         
         itemElement.innerHTML = `
           <div class="item-image">
@@ -606,8 +894,22 @@
           </div>
           <div class="item-details">
             <div class="item-name">${item.name}</div>
-            ${customizations ? `<div class="item-desc">${customizations}</div>` : ''}
-            <div class="item-price">${item.totalPrice.toFixed(2)} MAD</div>
+            
+            <!-- عرض الخيارات المخصصة كـ badges -->
+            ${customizations.length > 0 ? 
+              `<div class="customization-badges">
+                ${customizations.map(custom => `<span class="customization-badge">${custom}</span>`).join('')}
+              </div>` 
+              : ''
+            }
+            
+            <!-- عرض التعليمات الخاصة إذا كانت موجودة -->
+            ${item.specialInstructions ? 
+              `<div class="special-instructions">Note: ${item.specialInstructions}</div>` 
+              : ''
+            }
+            
+            <div class="item-price">${pricePerUnit.toFixed(2)} MAD x ${item.quantity} = ${item.totalPrice.toFixed(2)} MAD</div>
             <div class="item-controls">
               <button class="quantity-btn minus-btn"><i class="fas fa-minus"></i></button>
               <span class="item-quantity">${item.quantity}</span>
@@ -702,24 +1004,162 @@
         return;
       }
       
-      const totals = calculateTotals();
-      const message = `Hello! I would like to place an order:%0A%0A${generateOrderText()}%0A%0ASubtotal: ${totals.subtotal} MAD%0ADelivery: ${totals.deliveryFee} MAD%0ATax: ${totals.tax} MAD%0A%0ATotal: ${totals.total} MAD%0A%0APlease confirm the total amount including delivery charges.`;
+      // Validate customer information
+      if (!validateCustomerInfo()) {
+        return;
+      }
       
-      // Open WhatsApp with the order message
-      window.open(`https://wa.me/?text=${message}`, '_blank');
+      // Save customer info
+      saveCustomerInfo();
+      
+      // Generate and send WhatsApp message
+      sendWhatsAppOrder();
     }
 
-    // Generate order text for WhatsApp
-    function generateOrderText() {
-      return cart.map(item => 
-        `${item.quantity}x ${item.name} - ${item.totalPrice.toFixed(2)} MAD${item.drink && item.drink !== "none" ? ` (${item.drink})` : ''}${item.remove && item.remove.length > 0 ? ` [Remove: ${item.remove.join(', ')}]` : ''}${item.extras && item.extras.length > 0 ? ` [Extras: ${item.extras.join(', ')}]` : ''}`
-      ).join("%0A");
+    // Validate customer information
+    function validateCustomerInfo() {
+      const name = customerNameInput.value.trim();
+      const phone = customerPhoneInput.value.trim();
+      const address = customerAddressInput.value.trim();
+      
+      if (!name) {
+        alert("Please enter your full name.");
+        customerNameInput.focus();
+        return false;
+      }
+      
+      if (!phone) {
+        alert("Please enter your phone number.");
+        customerPhoneInput.focus();
+        return false;
+      }
+      
+      if (!address) {
+        alert("Please enter your delivery address.");
+        customerAddressInput.focus();
+        return false;
+      }
+      
+      // Basic phone validation
+      if (phone.length < 8) {
+        alert("Please enter a valid phone number.");
+        customerPhoneInput.focus();
+        return false;
+      }
+      
+      return true;
+    }
+
+    // Save customer information
+    function saveCustomerInfo() {
+      customerInfo = {
+        name: customerNameInput.value.trim(),
+        phone: customerPhoneInput.value.trim(),
+        address: customerAddressInput.value.trim(),
+        deliveryTime: document.querySelector('.time-option.selected').getAttribute('data-time')
+      };
+      
+      // Save to localStorage for future use
+      localStorage.setItem('mcdonaldsCustomerInfo', JSON.stringify(customerInfo));
+    }
+
+    // Load customer information
+    function loadCustomerInfo() {
+      try {
+        const savedInfo = localStorage.getItem('mcdonaldsCustomerInfo');
+        if (savedInfo) {
+          customerInfo = JSON.parse(savedInfo);
+          customerNameInput.value = customerInfo.name || "";
+          customerPhoneInput.value = customerInfo.phone || "";
+          customerAddressInput.value = customerInfo.address || "";
+          
+          // Set delivery time
+          document.querySelectorAll('.time-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.getAttribute('data-time') === customerInfo.deliveryTime) {
+              option.classList.add('selected');
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error loading customer info:", error);
+      }
+    }
+
+    // Send order via WhatsApp
+    function sendWhatsAppOrder() {
+      const totals = calculateTotals();
+      const message = generateWhatsAppMessage(totals);
+      
+      // Open WhatsApp with the order message
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      
+      // Clear cart after sending
+      setTimeout(() => {
+        cart = [];
+        saveCart();
+        renderCartItems();
+        updateCartDisplay();
+        alert("Order sent successfully! Your cart has been cleared.");
+      }, 1000);
+    }
+
+    // Generate WhatsApp message with ALL customizations
+    function generateWhatsAppMessage(totals) {
+      let message = `🍟 *NEW MCDONALD'S ORDER* 🍔\n\n`;
+      
+      // Customer Information
+      message += `*Customer Details:*\n`;
+      message += `👤 Name: ${customerInfo.name}\n`;
+      message += `📞 Phone: ${customerInfo.phone}\n`;
+      message += `📍 Address: ${customerInfo.address}\n`;
+      message += `⏰ Delivery: ${customerInfo.deliveryTime === 'asap' ? 'ASAP (25-35 min)' : 'Schedule Later'}\n\n`;
+      
+      // Order Details
+      message += `*Order Details:*\n`;
+      message += `====================\n\n`;
+      
+      // إضافة كل العناصر مع خياراتها
+      cart.forEach((item, index) => {
+        const customizationsText = formatCustomizationsForMessage(item);
+        message += `*${index + 1}. ${item.quantity}x ${item.name}*\n`;
+        message += `   Price: ${item.totalPrice.toFixed(2)} MAD\n`;
+        
+        if (customizationsText) {
+          message += `   Customizations:\n${customizationsText}`;
+        }
+        
+        if (item.specialInstructions && item.specialInstructions.trim() !== '') {
+          message += `   📝 Note: ${item.specialInstructions}\n`;
+        }
+        
+        message += `\n`;
+      });
+      
+      // Order Summary
+      message += `*Order Summary:*\n`;
+      message += `====================\n`;
+      message += `Subtotal: ${totals.subtotal} MAD\n`;
+      message += `Delivery Fee: ${totals.deliveryFee} MAD\n`;
+      message += `Tax (10%): ${totals.tax} MAD\n`;
+      message += `*Total: ${totals.total} MAD*\n\n`;
+      
+      // Payment Method
+      const paymentMethod = document.querySelector('input[name="payment"]:checked').nextElementSibling.textContent;
+      message += `*Payment Method:* ${paymentMethod}\n\n`;
+      
+      // Final Message
+      message += `====================\n`;
+      message += `Please confirm this order and let me know the estimated delivery time.\n`;
+      message += `Thank you! 🙏`;
+      
+      return message;
     }
 
     // Handle back button click
     function handleBackButton() {
-      // استخدام history.back() للعودة إلى الصفحة السابقة
-      window.history.back();
+      window.location.href = 'menukfc.html';
     }
 
     // Attach event listeners
@@ -732,6 +1172,27 @@
       
       // Back button
       backButton.addEventListener('click', handleBackButton);
+      
+      // Delivery time options
+      timeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          timeOptions.forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          customerInfo.deliveryTime = this.getAttribute('data-time');
+        });
+      });
+      
+      // Payment method selection
+      document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', function() {
+          document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          const radioInput = this.querySelector('input[type="radio"]');
+          if (radioInput) {
+            radioInput.checked = true;
+          }
+        });
+      });
       
       // Use event delegation for dynamic elements
       cartItemsContainer.addEventListener('click', function(e) {
@@ -748,10 +1209,22 @@
           removeItem(itemIndex);
         }
       });
+      
+      // Save customer info on input change
+      [customerNameInput, customerPhoneInput, customerAddressInput].forEach(input => {
+        input.addEventListener('input', function() {
+          saveCustomerInfo();
+        });
+      });
     }
 
     // Initialize the cart when the page loads
     document.addEventListener('DOMContentLoaded', initCart);
+    
+    // دالة مساعدة لعرض البيانات المخزنة في localStorage (لتصحيح الأخطاء)
+    function debugCart() {
+      console.log("Cart from localStorage:", JSON.parse(localStorage.getItem('mcdonaldsCart') || '[]'));
+    }
   </script>
 </body>
 </html>
