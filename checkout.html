@@ -6,6 +6,7 @@
   <title>Checkout</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
       --primary-red: #8B0000;
@@ -476,9 +477,185 @@
       box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
     }
     
-    .form-group textarea {
+    /* Location Section */
+    .location-section {
+      margin-bottom: 15px;
+    }
+    
+    .location-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .location-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    .location-type-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .location-type {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+    }
+    
+    .location-type.selected {
+      border-color: var(--primary-red);
+      background: rgba(139, 0, 0, 0.05);
+      font-weight: 500;
+    }
+    
+    .location-type i {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--primary-red);
+    }
+    
+    /* Map Container */
+    .map-container {
+      height: 250px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-light);
+      position: relative;
+    }
+    
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .map-controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1000;
+    }
+    
+    .map-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: white;
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--primary-red);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .map-btn:hover {
+      background: var(--primary-red);
+      color: white;
+      transform: scale(1.05);
+    }
+    
+    /* Address Display */
+    .address-display {
+      padding: 12px;
+      background: #F9F9F9;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px dashed var(--border-light);
+    }
+    
+    .address-text {
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    
+    .coordinates {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      font-family: monospace;
+      background: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+    }
+    
+    /* Location Actions */
+    .location-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .location-action-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .location-action-btn.primary {
+      background: var(--primary-red);
+      color: white;
+    }
+    
+    .location-action-btn.secondary {
+      background: var(--bg-light);
+      color: var(--text-dark);
+      border: 1px solid var(--border-light);
+    }
+    
+    .location-action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Delivery Instructions */
+    .delivery-instructions {
+      margin-bottom: 15px;
+    }
+    
+    .delivery-instructions textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
       resize: vertical;
       min-height: 80px;
+      background-color: #F9F9F9;
+      transition: all 0.3s ease;
+    }
+    
+    .delivery-instructions textarea:focus {
+      outline: none;
+      border-color: var(--primary-red);
+      background-color: white;
+      box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
     }
     
     /* Delivery Time Selection */
@@ -567,12 +744,22 @@
         padding: 10px;
       }
       
-      .time-options {
+      .time-options,
+      .location-type-selector {
         flex-direction: column;
       }
       
-      .time-option {
+      .time-option,
+      .location-type {
         min-width: 100%;
+      }
+      
+      .location-actions {
+        flex-direction: column;
+      }
+      
+      .map-container {
+        height: 200px;
       }
     }
   </style>
@@ -592,19 +779,87 @@
     
     <!-- Customer Information -->
     <div class="customer-info">
-      <h3>Customer Information</h3>
+      <h3>Delivery Information</h3>
+      
       <div class="form-group">
         <label for="customerName">Full Name *</label>
         <input type="text" id="customerName" placeholder="Enter your full name" required>
       </div>
+      
       <div class="form-group">
         <label for="customerPhone">Phone Number *</label>
         <input type="tel" id="customerPhone" placeholder="Enter your phone number" required>
       </div>
-      <div class="form-group">
-        <label for="customerAddress">Delivery Address *</label>
-        <textarea id="customerAddress" placeholder="Enter your full address for delivery" required></textarea>
+      
+      <!-- Location Section -->
+      <div class="location-section">
+        <div class="location-header">
+          <div class="location-title">Delivery Location *</div>
+          <div style="font-size: 0.75rem; color: var(--text-light);">
+            <i class="fas fa-map-marker-alt"></i> Pin your location
+          </div>
+        </div>
+        
+        <div class="location-type-selector">
+          <div class="location-type selected" data-type="current">
+            <i class="fas fa-location-crosshairs"></i>
+            <span>Current Location</span>
+          </div>
+          <div class="location-type" data-type="manual">
+            <i class="fas fa-map-pin"></i>
+            <span>Pin on Map</span>
+          </div>
+        </div>
+        
+        <!-- Map Container -->
+        <div class="map-container">
+          <div id="map"></div>
+          <div class="map-controls">
+            <button class="map-btn" id="locateBtn" title="Locate Me">
+              <i class="fas fa-crosshairs"></i>
+            </button>
+            <button class="map-btn" id="zoomInBtn" title="Zoom In">
+              <i class="fas fa-plus"></i>
+            </button>
+            <button class="map-btn" id="zoomOutBtn" title="Zoom Out">
+              <i class="fas fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Address Display -->
+        <div class="address-display">
+          <div class="address-text" id="addressText">
+            <i class="fas fa-spinner fa-spin"></i> Detecting your location...
+          </div>
+          <div class="coordinates" id="coordinates">
+            Latitude: --, Longitude: --
+          </div>
+        </div>
+        
+        <!-- Location Actions -->
+        <div class="location-actions">
+          <button class="location-action-btn primary" id="useLocationBtn">
+            <i class="fas fa-check"></i> Use This Location
+          </button>
+          <button class="location-action-btn secondary" id="searchLocationBtn">
+            <i class="fas fa-search"></i> Search Address
+          </button>
+        </div>
+        
+        <!-- Hidden Address Input -->
+        <input type="hidden" id="latitude">
+        <input type="hidden" id="longitude">
+        <input type="hidden" id="fullAddress">
       </div>
+      
+      <!-- Delivery Instructions -->
+      <div class="delivery-instructions">
+        <label for="deliveryNotes">Delivery Instructions (Optional)</label>
+        <textarea id="deliveryNotes" placeholder="Add delivery instructions (e.g., building number, floor, door code, landmarks, etc.)"></textarea>
+      </div>
+      
+      <!-- Delivery Time -->
       <div class="delivery-time">
         <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 10px; color: var(--text-dark);">Delivery Time</label>
         <div class="time-options">
@@ -686,28 +941,34 @@
         </button>
         
         <p class="info-text">
-          <i class="fas fa-info-circle"></i> When you complete your order via WhatsApp, we'll notify you of the total amount including delivery charges.
+          <i class="fas fa-info-circle"></i> Your location will be shared with the delivery driver via WhatsApp.
         </p>
       </div>
     </div>
   </div>
 
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
-    // Cart data structure - سيتم تحميلها من localStorage
+    // Cart data structure
     let cart = [];
 
     // Constants
     const DELIVERY_FEE = 20.00;
-    const TAX_RATE = 0.10; // 10%
+    const TAX_RATE = 0.10;
     const WHATSAPP_NUMBER = "212642620325";
 
-    // Customer Information
-    let customerInfo = {
-      name: "",
-      phone: "",
+    // Location variables
+    let map;
+    let marker;
+    let userLocation = {
+      lat: null,
+      lng: null,
       address: "",
-      deliveryTime: "asap"
+      formatted: ""
     };
+    let mapInitialized = false;
 
     // DOM elements
     const cartItemsContainer = document.getElementById('cart-items-container');
@@ -723,8 +984,206 @@
     // Customer Information Elements
     const customerNameInput = document.getElementById('customerName');
     const customerPhoneInput = document.getElementById('customerPhone');
-    const customerAddressInput = document.getElementById('customerAddress');
+    const deliveryNotesInput = document.getElementById('deliveryNotes');
     const timeOptions = document.querySelectorAll('.time-option');
+    const locationTypes = document.querySelectorAll('.location-type');
+
+    // Location Elements
+    const addressText = document.getElementById('addressText');
+    const coordinates = document.getElementById('coordinates');
+    const latitudeInput = document.getElementById('latitude');
+    const longitudeInput = document.getElementById('longitude');
+    const fullAddressInput = document.getElementById('fullAddress');
+    const locateBtn = document.getElementById('locateBtn');
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const useLocationBtn = document.getElementById('useLocationBtn');
+    const searchLocationBtn = document.getElementById('searchLocationBtn');
+
+    // Initialize map
+    function initMap() {
+      // Default location (Casablanca, Morocco)
+      const defaultLocation = [33.5731, -7.5898];
+      
+      // Create map
+      map = L.map('map').setView(defaultLocation, 13);
+      
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+      
+      // Add marker
+      marker = L.marker(defaultLocation, {
+        draggable: true,
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<div style="background: #8B0000; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;"><i class="fas fa-map-marker-alt" style="color: white; font-size: 14px;"></i></div>',
+          iconSize: [30, 30],
+          iconAnchor: [15, 30]
+        })
+      }).addTo(map);
+      
+      // Update location when marker is dragged
+      marker.on('dragend', function() {
+        updateLocationFromMarker();
+      });
+      
+      // Update location when map is clicked
+      map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateLocationFromMarker();
+      });
+      
+      // Get user's current location
+      getUserLocation();
+      
+      mapInitialized = true;
+    }
+
+    // Get user's current location
+    function getUserLocation() {
+      if (!navigator.geolocation) {
+        addressText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Geolocation is not supported by your browser';
+        return;
+      }
+      
+      addressText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting your location...';
+      
+      navigator.geolocation.getCurrentPosition(
+        // Success
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          // Update map view
+          map.setView([lat, lng], 16);
+          marker.setLatLng([lat, lng]);
+          
+          // Get address from coordinates
+          getAddressFromCoords(lat, lng);
+        },
+        // Error
+        function(error) {
+          console.error('Geolocation error:', error);
+          addressText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Could not detect your location. Please pin your location on the map.';
+          coordinates.textContent = 'Unable to get coordinates';
+        },
+        // Options
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    // Get address from coordinates using OpenStreetMap Nominatim
+    function getAddressFromCoords(lat, lng) {
+      userLocation.lat = lat;
+      userLocation.lng = lng;
+      
+      // Update coordinates display
+      coordinates.textContent = `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`;
+      
+      // Update hidden inputs
+      latitudeInput.value = lat;
+      longitudeInput.value = lng;
+      
+      // Show coordinates in address display
+      addressText.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Getting address...`;
+      
+      // Use OpenStreetMap Nominatim API
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.display_name) {
+            const address = data.display_name;
+            const shortAddress = getShortAddress(data);
+            
+            userLocation.address = shortAddress;
+            userLocation.formatted = address;
+            
+            addressText.innerHTML = `
+              <i class="fas fa-map-marker-alt" style="color: #8B0000;"></i>
+              <strong>${shortAddress}</strong>
+            `;
+            
+            fullAddressInput.value = address;
+          } else {
+            addressText.innerHTML = `
+              <i class="fas fa-map-marker-alt" style="color: #8B0000;"></i>
+              <strong>Location pinned successfully</strong>
+            `;
+            fullAddressInput.value = `Lat: ${lat}, Lng: ${lng}`;
+          }
+        })
+        .catch(error => {
+          console.error('Reverse geocoding error:', error);
+          addressText.innerHTML = `
+            <i class="fas fa-map-marker-alt" style="color: #8B0000;"></i>
+            <strong>Location pinned successfully</strong>
+          `;
+          fullAddressInput.value = `Lat: ${lat}, Lng: ${lng}`;
+        });
+    }
+
+    // Extract short address from Nominatim response
+    function getShortAddress(data) {
+      const address = data.address;
+      let shortAddress = '';
+      
+      if (address.road) shortAddress += address.road + ', ';
+      if (address.neighbourhood) shortAddress += address.neighbourhood + ', ';
+      if (address.suburb) shortAddress += address.suburb + ', ';
+      if (address.city) shortAddress += address.city;
+      
+      if (!shortAddress && data.display_name) {
+        // Fallback to first part of display name
+        shortAddress = data.display_name.split(',')[0];
+      }
+      
+      return shortAddress || 'Unknown Location';
+    }
+
+    // Update location from marker position
+    function updateLocationFromMarker() {
+      const latLng = marker.getLatLng();
+      getAddressFromCoords(latLng.lat, latLng.lng);
+    }
+
+    // Search for location
+    function searchLocation() {
+      const query = prompt('Enter an address, place, or landmark:');
+      if (!query) return;
+      
+      addressText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching location...';
+      
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            const result = data[0];
+            const lat = parseFloat(result.lat);
+            const lng = parseFloat(result.lon);
+            
+            // Update map
+            map.setView([lat, lng], 16);
+            marker.setLatLng([lat, lng]);
+            
+            // Get detailed address
+            getAddressFromCoords(lat, lng);
+          } else {
+            alert('Location not found. Please try a different search.');
+            addressText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Location not found';
+          }
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+          alert('Error searching location. Please try again.');
+        });
+    }
 
     // دالة للحصول على محتويات السلة من localStorage
     function getCart() {
@@ -746,17 +1205,14 @@
     function formatCustomizationsForDisplay(item) {
       let customizations = [];
       
-      // معالجة جميع أنواع التخصيصات
       if (item.customizations) {
         Object.keys(item.customizations).forEach(key => {
           const value = item.customizations[key];
           
-          // تخطي الحقول الفارغة
           if (!value || (Array.isArray(value) && value.length === 0)) {
             return;
           }
           
-          // تحويل المفتاح إلى نص مقروء
           let displayKey = key;
           switch(key) {
             case 'drink': displayKey = 'Drink'; break;
@@ -769,87 +1225,29 @@
             default: displayKey = key.charAt(0).toUpperCase() + key.slice(1);
           }
           
-          // معالجة القيم المختلفة
           if (Array.isArray(value)) {
             if (value.length > 0) {
-              // إذا كانت المصفوفة تحتوي على كائنات
               if (typeof value[0] === 'object') {
                 const labels = value.map(v => v.label || v.value).filter(v => v);
                 if (labels.length > 0) {
                   customizations.push(`${displayKey}: ${labels.join(', ')}`);
                 }
               } else {
-                // إذا كانت المصفوفة تحتوي على قيم نصية مباشرة
                 customizations.push(`${displayKey}: ${value.join(', ')}`);
               }
             }
           } else if (typeof value === 'object' && value !== null) {
-            // إذا كانت القيمة كائن
             const label = value.label || value.value;
             if (label) {
               customizations.push(`${displayKey}: ${label}`);
             }
           } else if (value) {
-            // إذا كانت القيمة نصية مباشرة
             customizations.push(`${displayKey}: ${value}`);
           }
         });
       }
       
       return customizations;
-    }
-    
-    // دالة لتحويل الخيارات المخصصة إلى نص للرسالة
-    function formatCustomizationsForMessage(item) {
-      let customizationsText = "";
-      
-      if (item.customizations) {
-        Object.keys(item.customizations).forEach(key => {
-          const value = item.customizations[key];
-          
-          // تخطي الحقول الفارغة
-          if (!value || (Array.isArray(value) && value.length === 0)) {
-            return;
-          }
-          
-          // تحويل المفتاح إلى نص مقروء
-          let displayKey = key;
-          switch(key) {
-            case 'drink': displayKey = 'Drink'; break;
-            case 'size': displayKey = 'Size'; break;
-            case 'remove': displayKey = 'Remove'; break;
-            case 'extras': displayKey = 'Extras'; break;
-            case 'sauces': displayKey = 'Sauces'; break;
-            case 'dressing': displayKey = 'Dressing'; break;
-            case 'salt': displayKey = 'Salt Level'; break;
-            default: displayKey = key.charAt(0).toUpperCase() + key.slice(1);
-          }
-          
-          // معالجة القيم المختلفة
-          if (Array.isArray(value)) {
-            if (value.length > 0) {
-              let itemsList = [];
-              value.forEach(v => {
-                if (typeof v === 'object') {
-                  itemsList.push(v.label || v.value);
-                } else {
-                  itemsList.push(v);
-                }
-              });
-              customizationsText += `   • ${displayKey}: ${itemsList.join(', ')}\n`;
-            }
-          } else if (typeof value === 'object' && value !== null) {
-            const label = value.label || value.value;
-            if (label) {
-              customizationsText += `   • ${displayKey}: ${label}\n`;
-            }
-          } else if (value) {
-            customizationsText += `   • ${displayKey}: ${value}\n`;
-          }
-        });
-      }
-      
-      return customizationsText;
     }
     
     // Initialize the cart
@@ -860,6 +1258,13 @@
       updateCartDisplay();
       attachEventListeners();
       loadCustomerInfo();
+      
+      // Initialize map after cart
+      setTimeout(() => {
+        if (!mapInitialized) {
+          initMap();
+        }
+      }, 100);
     }
     
     // Render cart items in the UI
@@ -882,10 +1287,7 @@
         itemElement.className = 'item-card';
         itemElement.setAttribute('data-id', index);
         
-        // الحصول على الخيارات المخصصة
         const customizations = formatCustomizationsForDisplay(item);
-        
-        // حساب السعر لكل عنصر
         const pricePerUnit = item.totalPrice / item.quantity;
         
         itemElement.innerHTML = `
@@ -895,7 +1297,6 @@
           <div class="item-details">
             <div class="item-name">${item.name}</div>
             
-            <!-- عرض الخيارات المخصصة كـ badges -->
             ${customizations.length > 0 ? 
               `<div class="customization-badges">
                 ${customizations.map(custom => `<span class="customization-badge">${custom}</span>`).join('')}
@@ -903,7 +1304,6 @@
               : ''
             }
             
-            <!-- عرض التعليمات الخاصة إذا كانت موجودة -->
             ${item.specialInstructions ? 
               `<div class="special-instructions">Note: ${item.specialInstructions}</div>` 
               : ''
@@ -941,13 +1341,11 @@
     function updateCartDisplay() {
       const totals = calculateTotals();
       
-      // Update summary
       subtotalElement.textContent = `${totals.subtotal} MAD`;
       deliveryFeeElement.textContent = `${totals.deliveryFee} MAD`;
       taxElement.textContent = `${totals.tax} MAD`;
       totalPriceElement.textContent = `${totals.total} MAD`;
       
-      // Update cart count
       const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
       cartCount.textContent = `Order Items (${totalItems})`;
     }
@@ -957,11 +1355,9 @@
       if (cart[itemIndex]) {
         cart[itemIndex].quantity += change;
         
-        // تحديث السعر الإجمالي بناء على الكمية
         const pricePerUnit = cart[itemIndex].totalPrice / cart[itemIndex].quantity;
         cart[itemIndex].totalPrice = pricePerUnit * cart[itemIndex].quantity;
         
-        // Remove item if quantity is 0
         if (cart[itemIndex].quantity <= 0) {
           cart.splice(itemIndex, 1);
         }
@@ -992,7 +1388,6 @@
         renderCartItems();
         updateCartDisplay();
         
-        // إظهار رسالة تأكيد
         alert("Your cart has been cleared successfully.");
       }
     }
@@ -1004,15 +1399,15 @@
         return;
       }
       
-      // Validate customer information
       if (!validateCustomerInfo()) {
         return;
       }
       
-      // Save customer info
-      saveCustomerInfo();
+      if (!validateLocation()) {
+        return;
+      }
       
-      // Generate and send WhatsApp message
+      saveCustomerInfo();
       sendWhatsAppOrder();
     }
 
@@ -1020,7 +1415,6 @@
     function validateCustomerInfo() {
       const name = customerNameInput.value.trim();
       const phone = customerPhoneInput.value.trim();
-      const address = customerAddressInput.value.trim();
       
       if (!name) {
         alert("Please enter your full name.");
@@ -1034,13 +1428,6 @@
         return false;
       }
       
-      if (!address) {
-        alert("Please enter your delivery address.");
-        customerAddressInput.focus();
-        return false;
-      }
-      
-      // Basic phone validation
       if (phone.length < 8) {
         alert("Please enter a valid phone number.");
         customerPhoneInput.focus();
@@ -1050,16 +1437,31 @@
       return true;
     }
 
+    // Validate location
+    function validateLocation() {
+      if (!userLocation.lat || !userLocation.lng) {
+        alert("Please select your delivery location on the map.");
+        return false;
+      }
+      
+      if (!userLocation.address) {
+        alert("Please confirm your location by clicking 'Use This Location'.");
+        return false;
+      }
+      
+      return true;
+    }
+
     // Save customer information
     function saveCustomerInfo() {
-      customerInfo = {
+      const customerInfo = {
         name: customerNameInput.value.trim(),
         phone: customerPhoneInput.value.trim(),
-        address: customerAddressInput.value.trim(),
-        deliveryTime: document.querySelector('.time-option.selected').getAttribute('data-time')
+        deliveryNotes: deliveryNotesInput.value.trim(),
+        deliveryTime: document.querySelector('.time-option.selected').getAttribute('data-time'),
+        location: userLocation
       };
       
-      // Save to localStorage for future use
       localStorage.setItem('mcdonaldsCustomerInfo', JSON.stringify(customerInfo));
     }
 
@@ -1068,10 +1470,10 @@
       try {
         const savedInfo = localStorage.getItem('mcdonaldsCustomerInfo');
         if (savedInfo) {
-          customerInfo = JSON.parse(savedInfo);
+          const customerInfo = JSON.parse(savedInfo);
           customerNameInput.value = customerInfo.name || "";
           customerPhoneInput.value = customerInfo.phone || "";
-          customerAddressInput.value = customerInfo.address || "";
+          deliveryNotesInput.value = customerInfo.deliveryNotes || "";
           
           // Set delivery time
           document.querySelectorAll('.time-option').forEach(option => {
@@ -1080,6 +1482,22 @@
               option.classList.add('selected');
             }
           });
+          
+          // Set location if available
+          if (customerInfo.location && customerInfo.location.lat) {
+            userLocation = customerInfo.location;
+            latitudeInput.value = customerInfo.location.lat;
+            longitudeInput.value = customerInfo.location.lng;
+            fullAddressInput.value = customerInfo.location.formatted || "";
+            
+            if (customerInfo.location.address) {
+              addressText.innerHTML = `
+                <i class="fas fa-map-marker-alt" style="color: #8B0000;"></i>
+                <strong>${customerInfo.location.address}</strong>
+              `;
+              coordinates.textContent = `Latitude: ${customerInfo.location.lat}, Longitude: ${customerInfo.location.lng}`;
+            }
+          }
         }
       } catch (error) {
         console.error("Error loading customer info:", error);
@@ -1091,7 +1509,6 @@
       const totals = calculateTotals();
       const message = generateWhatsAppMessage(totals);
       
-      // Open WhatsApp with the order message
       const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
       
@@ -1105,32 +1522,41 @@
       }, 1000);
     }
 
-    // Generate WhatsApp message with ALL customizations
+    // Generate WhatsApp message
     function generateWhatsAppMessage(totals) {
       let message = `🍟 *NEW MCDONALD'S ORDER* 🍔\n\n`;
       
       // Customer Information
       message += `*Customer Details:*\n`;
-      message += `👤 Name: ${customerInfo.name}\n`;
-      message += `📞 Phone: ${customerInfo.phone}\n`;
-      message += `📍 Address: ${customerInfo.address}\n`;
-      message += `⏰ Delivery: ${customerInfo.deliveryTime === 'asap' ? 'ASAP (25-35 min)' : 'Schedule Later'}\n\n`;
+      message += `👤 Name: ${customerNameInput.value.trim()}\n`;
+      message += `📞 Phone: ${customerPhoneInput.value.trim()}\n`;
+      
+      // Location Information
+      message += `📍 *Delivery Location:*\n`;
+      message += `${userLocation.formatted || userLocation.address}\n`;
+      message += `Coordinates: ${userLocation.lat}, ${userLocation.lng}\n`;
+      message += `Google Maps: https://www.google.com/maps?q=${userLocation.lat},${userLocation.lng}\n`;
+      
+      if (deliveryNotesInput.value.trim()) {
+        message += `📝 Delivery Instructions: ${deliveryNotesInput.value.trim()}\n`;
+      }
+      
+      message += `⏰ Delivery: ${document.querySelector('.time-option.selected').getAttribute('data-time') === 'asap' ? 'ASAP (25-35 min)' : 'Schedule Later'}\n\n`;
       
       // Order Details
       message += `*Order Details:*\n`;
       message += `====================\n\n`;
       
-      // إضافة كل العناصر مع خياراتها
       cart.forEach((item, index) => {
-        const customizationsText = formatCustomizationsForMessage(item);
+        const customizations = formatCustomizationsForDisplay(item);
         message += `*${index + 1}. ${item.quantity}x ${item.name}*\n`;
         message += `   Price: ${item.totalPrice.toFixed(2)} MAD\n`;
         
-        if (customizationsText) {
-          message += `   Customizations:\n${customizationsText}`;
+        if (customizations.length > 0) {
+          message += `   Customizations: ${customizations.join(' | ')}\n`;
         }
         
-        if (item.specialInstructions && item.specialInstructions.trim() !== '') {
+        if (item.specialInstructions) {
           message += `   📝 Note: ${item.specialInstructions}\n`;
         }
         
@@ -1149,8 +1575,11 @@
       const paymentMethod = document.querySelector('input[name="payment"]:checked').nextElementSibling.textContent;
       message += `*Payment Method:* ${paymentMethod}\n\n`;
       
-      // Final Message
+      // Final Message with Map Link
       message += `====================\n`;
+      message += `*📍 Customer Location:*\n`;
+      message += `Google Maps: https://www.google.com/maps?q=${userLocation.lat},${userLocation.lng}\n`;
+      message += `OpenStreetMap: https://www.openstreetmap.org/?mlat=${userLocation.lat}&mlon=${userLocation.lng}#map=17/${userLocation.lat}/${userLocation.lng}\n\n`;
       message += `Please confirm this order and let me know the estimated delivery time.\n`;
       message += `Thank you! 🙏`;
       
@@ -1178,9 +1607,33 @@
         option.addEventListener('click', function() {
           timeOptions.forEach(opt => opt.classList.remove('selected'));
           this.classList.add('selected');
-          customerInfo.deliveryTime = this.getAttribute('data-time');
         });
       });
+      
+      // Location type selection
+      locationTypes.forEach(type => {
+        type.addEventListener('click', function() {
+          locationTypes.forEach(t => t.classList.remove('selected'));
+          this.classList.add('selected');
+          
+          if (this.getAttribute('data-type') === 'current') {
+            getUserLocation();
+          }
+        });
+      });
+      
+      // Map controls
+      locateBtn.addEventListener('click', getUserLocation);
+      zoomInBtn.addEventListener('click', () => map.zoomIn());
+      zoomOutBtn.addEventListener('click', () => map.zoomOut());
+      useLocationBtn.addEventListener('click', () => {
+        if (userLocation.lat && userLocation.lng) {
+          alert('Location confirmed! Your delivery will be sent to this address.');
+        } else {
+          alert('Please select a location on the map first.');
+        }
+      });
+      searchLocationBtn.addEventListener('click', searchLocation);
       
       // Payment method selection
       document.querySelectorAll('.payment-option').forEach(option => {
@@ -1211,20 +1664,13 @@
       });
       
       // Save customer info on input change
-      [customerNameInput, customerPhoneInput, customerAddressInput].forEach(input => {
-        input.addEventListener('input', function() {
-          saveCustomerInfo();
-        });
+      [customerNameInput, customerPhoneInput, deliveryNotesInput].forEach(input => {
+        input.addEventListener('input', saveCustomerInfo);
       });
     }
 
-    // Initialize the cart when the page loads
+    // Initialize when page loads
     document.addEventListener('DOMContentLoaded', initCart);
-    
-    // دالة مساعدة لعرض البيانات المخزنة في localStorage (لتصحيح الأخطاء)
-    function debugCart() {
-      console.log("Cart from localStorage:", JSON.parse(localStorage.getItem('mcdonaldsCart') || '[]'));
-    }
   </script>
 </body>
 </html>
